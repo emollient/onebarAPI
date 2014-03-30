@@ -1,23 +1,24 @@
 from restapi.services import Favorites
 from restapi.validators import JSON, ValidFields
 from restapi.models import DBSession, Favorites, CSH_Services
-
+from pyramid.httpexceptions import HTTPForbidden
+import json
 
 
 
 @Favorites.get(validators=[ValidJSON], renderer='json')
-def getFavorite(request):
-    for favorite in request.validated['favorites']:
-        if favorite is request:
+def getFavoriteByRank(request):
+    for favorite in DBSession.query(Favorites).order_by(Favorites.rank):
+        if favorite.rank is request.validated['favorite'].rank:
             return {'service_id': favorite.service_id,
                     'rank': favorite.rank
                    }
-    return
+    return HTTPForbidden()
 
 @Favorites.get(validators=[ValidJSON], renderer='json')
 def getOrderedFavorites(request):
     arr = []
-    for favorite in request.validated['favorites']:
+    for favorite in DBSession.query(Favorites).order_by(Favorites.rank):
         obj = {}
         obj['service_id'] = favorite.service_id
         obj['rank'] = favorite.rank
