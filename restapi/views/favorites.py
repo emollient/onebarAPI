@@ -6,8 +6,20 @@ import json
 
 
 
+
 @Faves.get(validators=[JSON], renderer='json')
 def getFavoriteByRank(request):
+    """
+    ->
+    {
+        'rank'
+    }
+    <-
+    {
+        'service_id': <>
+        'rank': <>
+    }
+    """
     for favorite in DBSession.query(Favorites).order_by(Favorites.rank):
         if favorite.rank is request.validated['favorite'].rank:
             return {'service_id': favorite.service_id,
@@ -17,6 +29,16 @@ def getFavoriteByRank(request):
 
 @Faves.get(validators=[JSON], renderer='json')
 def getOrderedFavorites(request):
+    """
+    <-
+    {
+        all favorites objects ordered by rank
+        {
+            'service_id': <>
+            'rank': <>
+        }
+    }
+    """
     arr = []
     for favorite in DBSession.query(Favorites).order_by(Favorites.rank):
         obj = {}
@@ -27,6 +49,19 @@ def getOrderedFavorites(request):
 
 @Faves.post(validators=[JSON, ValidFields('rank','service_id')])
 def addFavorites(request):
+    """
+    ->
+    {
+        'rank'
+        'service_id'
+    }
+    <-
+    {
+        'success': True
+        'service_id': <>
+        'rank': <>
+    }
+    """
     uid = request.validated['services'].id
     new_fav = Favorites(
             service_id = request.validated['csh_services'],

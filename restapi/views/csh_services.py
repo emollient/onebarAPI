@@ -6,6 +6,15 @@ import json
 
 @cshServices.get(validators=[JSON], renderer='json')
 def getServiceByID(request):
+    """
+    <-
+    {
+        'id': <>
+        'icon': <>
+        'name': <>
+        'url': <>
+    }
+    """
     for service in DBSession.query(CSH_Services).order_by(CSH_Services.id):
         if service.id is request.validated['csh_services'].id:
             return{
@@ -18,6 +27,18 @@ def getServiceByID(request):
 
 @cshServices.get(validators=[JSON], renderer='json')
 def getServices(request):
+    """
+    <-
+    {
+    all service objects
+        {
+            'id': <>
+            'icon': <>
+            'name': <>
+            'url': <>
+        }
+    }
+    """
     arr = []
     for csh_service in DBSession.query(CSH_Services).order_by(CSH_Services.id):
         service_wrapper = {}
@@ -35,6 +56,22 @@ def deleteService(request):
 
 @cshServices.post(validators=[JSON, ValidFields('name','icon','url')])
 def addService(request):
+    """
+    ->
+    {
+        'name'
+        'icon'
+        'url'
+    }
+    <-
+    {
+        'success': True
+        'id': <>
+        'icon': <>
+        'name': <>
+        'url': <>
+    }
+    """
     service_id = request.validated['services'].id
     new_service = CSH_Services(
             id = service_id,
