@@ -24,11 +24,10 @@ Base = declarative_base()
 
 class Favorites(Base):
     __tablename__ = 'favorites'
-    uid = Column(Integer, primary_key=True)
+    id = Column(Integer, unique=True, primary_key=True)
     rank = Column(Integer)
     service_id = Column(Integer, ForeignKey('csh_services.id'))
-    services_mapper = relationship('CSH_Services',
-            backref=backref('favorites', order_by= uid),
+    services_mapper = relationship('CSH_Services', backref='favorites',
             order_by="desc(CSH_Services.id)")
 
 

@@ -1,4 +1,4 @@
-from restapi.services import Favorites
+from restapi.services import Faves
 from restapi.validators import JSON, ValidFields
 from restapi.models import DBSession, Favorites, CSH_Services
 from pyramid.httpexceptions import HTTPForbidden
@@ -6,7 +6,7 @@ import json
 
 
 
-@Favorites.get(validators=[ValidJSON], renderer='json')
+@Faves.get(validators=[JSON], renderer='json')
 def getFavoriteByRank(request):
     for favorite in DBSession.query(Favorites).order_by(Favorites.rank):
         if favorite.rank is request.validated['favorite'].rank:
@@ -15,7 +15,7 @@ def getFavoriteByRank(request):
                    }
     return HTTPForbidden()
 
-@Favorites.get(validators=[ValidJSON], renderer='json')
+@Faves.get(validators=[JSON], renderer='json')
 def getOrderedFavorites(request):
     arr = []
     for favorite in DBSession.query(Favorites).order_by(Favorites.rank):
@@ -25,7 +25,7 @@ def getOrderedFavorites(request):
         arr.append(obj)
     return json.load(arr)
 
-@Favorites.post(validators=[ValidJSON, ValidFields('rank','service_id')])
+@Faves.post(validators=[JSON, ValidFields('rank','service_id')])
 def addFavorites(request):
     uid = request.validated['services'].id
     new_fav = Favorites(
@@ -41,7 +41,7 @@ def addFavorites(request):
             'rank': new_fav.rank
             }
 
-@Favorites.delete()
+@Faves.delete()
 def removeFavorites(request):
     """
     does it's own thing

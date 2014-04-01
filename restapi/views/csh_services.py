@@ -1,10 +1,10 @@
 from restapi.validators import JSON, ValidFields
-from restapi.services import CSH_Services
+from restapi.services import cshServices
 from restapi.models import DBSession, CSH_Services
 from pyramid.httpexceptions import HTTPForbidden
 import json
 
-@CSH_Services.get(validators=[ValidJSON], renderer='json')
+@cshServices.get(validators=[JSON], renderer='json')
 def getServiceByID(request):
     for service in DBSession.query(CSH_Services).order_by(CSH_Services.id):
         if service.id is request.validated['csh_services'].id:
@@ -16,7 +16,7 @@ def getServiceByID(request):
                     }
     return HTTPForbidden()
 
-@CSH_Services.get(validators=[ValidJSON], renderer='json')
+@cshServices.get(validators=[JSON], renderer='json')
 def getServices(request):
     arr = []
     for csh_service in DBSession.query(CSH_Services).order_by(CSH_Services.id):
@@ -29,11 +29,11 @@ def getServices(request):
         arr.append(service_wrapper)
     return json.load(arr)
 
-@CSH_Services.delete()
+@cshServices.delete()
 def deleteService(request):
     pass
 
-@CSH_Services.post(validators=[ValidJSON, ValidFields('name','icon','url')])
+@cshServices.post(validators=[JSON, ValidFields('name','icon','url')])
 def addService(request):
     service_id = request.validated['services'].id
     new_service = CSH_Services(
