@@ -1,5 +1,6 @@
-from restapi.services import Faves
+from restapi.services import Faves, AllFaves
 from restapi.validators import JSON, ValidFields
+from sqlalchemy import desc
 from restapi.models import DBSession, Favorites, CSH_Services
 from pyramid.httpexceptions import HTTPForbidden
 import json
@@ -7,7 +8,7 @@ import json
 
 
 
-@Faves.get(validators=[JSON], renderer='json')
+@Faves.get(renderer='json')
 def getFavoriteByRank(request):
     """
     ->
@@ -21,13 +22,14 @@ def getFavoriteByRank(request):
     }
     """
     for favorite in DBSession.query(Favorites).order_by(Favorites.rank):
-        if favorite.rank is request.validated['favorite'].rank:
+        if favorite.rank == int(request.GET['rank']):
+        #if favorite.rank is request.validated['favorite'].rank:
             return {'service_id': favorite.service_id,
                     'rank': favorite.rank
                    }
     return HTTPForbidden()
 
-@Faves.get(validators=[JSON], renderer='json')
+@AllFaves.get(renderer='json')
 def getOrderedFavorites(request):
     """
     <-
@@ -62,16 +64,21 @@ def addFavorites(request):
         'rank': <>
     }
     """
-    uid = request.validated['services'].id
+    if (len(DBSession.query(Favorites).order_by(desc(Favorites.id)).all()) == 0):
+        uid = 0
+    else:
+        uid = DBSession.query(Favorites).order_by(desc(Favorites.id)).first().id + 1
     new_fav = Favorites(
-            service_id = request.validated['csh_services'],
-            rank = request.validated['json']['rank']
+            id = uid,
+            service_id = request.json_body['service_id'],
+            rank = request.json_body['rank']
     )
-    new_fav.service_mapper = request.validated['json']['service_mapper']
+
     DBSession.add(new_fav)
-    DBSession.commit()
+    #DBSession.commit()
     return {
             'success': True,
+            'id': new_fav.id,
             'service_id': new_fav.service_id,
             'rank': new_fav.rank
             }

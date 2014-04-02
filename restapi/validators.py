@@ -6,7 +6,8 @@ from re import compile as re_compile
 
 
 def JSON(request):
-    data = json.loads(request.body);
+    print "Validating json of: " + request.body
+    data = json.loads(request.body)
     request.validated['json'] = data
 
 

@@ -1,5 +1,5 @@
 from restapi.validators import JSON, ValidFields
-from restapi.services import cshServices
+from restapi.services import cshServices, allcshServices
 from restapi.models import DBSession, CSH_Services
 from pyramid.httpexceptions import HTTPForbidden
 import json
@@ -25,7 +25,7 @@ def getServiceByID(request):
                     }
     return HTTPForbidden()
 
-@cshServices.get(validators=[JSON], renderer='json')
+@allcshServices.get(validators=[JSON], renderer='json')
 def getServices(request):
     """
     <-
