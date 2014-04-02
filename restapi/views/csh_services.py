@@ -1,10 +1,11 @@
 from restapi.validators import JSON, ValidFields
 from restapi.services import cshServices, allcshServices
 from restapi.models import DBSession, CSH_Services
+from sqlalchemy import desc
 from pyramid.httpexceptions import HTTPForbidden
 import json
 
-@cshServices.get(validators=[JSON], renderer='json')
+@cshServices.get(renderer='json')
 def getServiceByID(request):
     """
     <-
@@ -16,7 +17,7 @@ def getServiceByID(request):
     }
     """
     for service in DBSession.query(CSH_Services).order_by(CSH_Services.id):
-        if service.id is request.validated['csh_services'].id:
+        if service.id == int(request.GET['id']):
             return{
                     'id': service.id,
                     'icon': service.icon,
@@ -25,7 +26,7 @@ def getServiceByID(request):
                     }
     return HTTPForbidden()
 
-@allcshServices.get(validators=[JSON], renderer='json')
+@allcshServices.get(renderer='json')
 def getServices(request):
     """
     <-
@@ -48,7 +49,7 @@ def getServices(request):
         service_wrapper['url'] = csh_service.url
 
         arr.append(service_wrapper)
-    return json.load(arr)
+    return arr
 
 @cshServices.delete()
 def deleteService(request):
@@ -72,16 +73,19 @@ def addService(request):
         'url': <>
     }
     """
-    service_id = request.validated['services'].id
+    if (len(DBSession.query(CSH_Services).order_by(desc(CSH_Services.id)).all()) == 0):
+        service_id = 0
+    else:
+        service_id = DBSession.query(CSH_Services).order_by(desc(CSH_Services.id)).first().id + 1
+
     new_service = CSH_Services(
             id = service_id,
-            icon = request.validated['json']['icon'],
-            name = request.validated['json']['name'],
-            url = request.validated['json']['url']
+            icon = request.json_body['icon'],
+            name = request.json_body['name'],
+            url = request.json_body['url']
 
             )
     DBSession.add(new_service)
-    DBSession.commit()
     return {
             'success': True,
             'id': new_service.id,

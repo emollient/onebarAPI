@@ -47,7 +47,7 @@ def getOrderedFavorites(request):
         obj['service_id'] = favorite.service_id
         obj['rank'] = favorite.rank
         arr.append(obj)
-    return json.load(arr)
+    return arr
 
 @Faves.post(validators=[JSON, ValidFields('rank','service_id')])
 def addFavorites(request):
