@@ -88,5 +88,10 @@ def removeFavorites(request):
     """
     does it's own thing
     """
-    pass
+    for favorite in DBSession.query(Favorites).order_by(desc(Favorites.id)):
+        if favorite.service_id == request.GET['service_id']:
+            DBSession.delete(favorite)
+    return{
+            'success':True
+            }
 
