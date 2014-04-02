@@ -51,9 +51,14 @@ def getServices(request):
         arr.append(service_wrapper)
     return arr
 
-@cshServices.delete()
+@cshServices.delete(renderer = 'json')
 def deleteService(request):
-    pass
+    for service in DBSession.query(CSH_Services).order_by(CSH_Services.id):
+        if service.name == request.GET['name']:
+            DBSession.delete(service)
+    return {
+            'success': True
+            }
 
 @cshServices.post(validators=[JSON, ValidFields('name','icon','url')])
 def addService(request):
